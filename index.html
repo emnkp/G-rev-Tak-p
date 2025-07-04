@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <title>Akıllı Görev Takip Uygulaması</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+        }
+
+        .container {
+            background-color: white;
+            padding: 20px;
+            border-radius: 10px;
+            width: 300px;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+            text-align: center;
+        }
+
+        input {
+            width: 80%;
+            padding: 8px;
+            margin-bottom: 10px;
+        }
+
+        button {
+            padding: 8px 12px;
+            background-color: #28a745;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        li {
+            text-align: left;
+            margin: 8px 0;
+            list-style: none;
+            padding: 5px;
+            border-bottom: 1px solid #ccc;
+            display: flex;
+            justify-content: space-between;
+        }
+
+        li.tamamlandi {
+            text-decoration: line-through;
+            color: gray;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Görev Takip</h1>
+        <input type="text" id="gorevInput" placeholder="Yeni görev girin...">
+        <button onclick="gorevEkle()">Ekle</button>
+        <ul id="gorevListesi"></ul>
+    </div>
+
+    <script>
+        // Sayfa yüklendiğinde kayıtlı görevleri getir
+        window.onload = function() {
+            gorevleriYukle();
+        };
+
+        function gorevEkle() {
+            let input = document.getElementById("gorevInput");
+            let gorevMetni = input.value.trim();
+
+            if (gorevMetni === "") return;
+
+            let li = document.createElement("li");
+            li.textContent = gorevMetni;
+
+            li.onclick = function () {
+                li.classList.toggle("tamamlandi");
+                gorevleriKaydet();
+            };
+
+            let silBtn = document.createElement("button");
+            silBtn.textContent = "Sil";
+            silBtn.onclick = function (e) {
+                e.stopPropagation();
+                li.remove();
+                gorevleriKaydet();
+            };
+
+            li.appendChild(silBtn);
+            document.getElementById("gorevListesi").appendChild(li);
+            input.value = "";
+
+            gorevleriKaydet();
+        }
+
+        function gorevleriKaydet() {
+            let liste = document.getElementById("gorevListesi").innerHTML;
+            localStorage.setItem("gorevler", liste);
+        }
+
+        function gorevleriYukle() {
+            let kayitli = localStorage.getItem("gorevler");
+            if (kayitli) {
+                document.getElementById("gorevListesi").innerHTML = kayitli;
+
+                document.querySelectorAll("#gorevListesi li").forEach(function(li) {
+                    li.onclick = function () {
+                        li.classList.toggle("tamamlandi");
+                        gorevleriKaydet();
+                    };
+
+                    let silBtn = li.querySelector("button");
+                    if (silBtn) {
+                        silBtn.onclick = function (e) {
+                            e.stopPropagation();
+                            li.remove();
+                            gorevleriKaydet();
+                        };
+                    }
+                });
+            }
+        }
+    </script>
+</body>
+</html>
